@@ -1,40 +1,75 @@
-name: Share Data Between Jobs
+# name: Share Data Between Jobs
 
-on:
-  push:
-    branches: ["main"]
-  workflow_dispatch:
+# on: push
+
+# jobs:
+#   job_1:
+#     name: Create Artifact
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Checkout code
+#         uses: actions/checkout@v4
+
+#       - name: Create a dummy file
+#         run: |
+#           echo "Hello from Job 1! Created at $(date)" > output.txt
+
+#       - name: Upload the file to artifacts
+#         uses: actions/upload-artifact@v4
+#         with:
+#           name: my-shared-file
+#           path: output.txt
+
+#   # Job 2: Download and Read the file
+#   job_2:
+#     name: Process Artifact
+#     runs-on: ubuntu-latest
+#     needs: job_1
+#     steps:
+#       - name: Download the artifact
+#         uses: actions/download-artifact@v4
+#         with:
+#           name: my-shared-file
+
+#       - name: Verify and display content
+#         run: |
+#           echo "Displaying the downloaded file content:"
+#           cat output.txt
+
+name: My First Workflow
+
+on: push
 
 jobs:
-  job_1:
-    name: Create Artifact
+  test:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Create a dummy file
-        run: |
-          echo "Hello from Job 1! Created at $(date)" > output.txt
-
-      - name: Upload the file to artifacts
-        uses: actions/upload-artifact@v4
+      - name: Setup node
+        uses: actions/setup-node@v4
         with:
-          name: my-shared-file
-          path: output.txt
+          node-version: 24
+          cache: "npm"
 
-  # Job 2: Download and Read the file
-  job_2:
-    name: Process Artifact
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run ESLint
+        run: npm run lint
+
+      - name: Run tests
+        run: npm run test
+
+      - name: Build project
+        run: npm run build
+
+  deploy-app:
     runs-on: ubuntu-latest
-    needs: job_1
-    steps:
-      - name: Download the artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: my-shared-file
+    needs: test
 
-      - name: Verify and display content
-        run: |
-          echo "Displaying the downloaded file content:"
-          cat output.txt
+    steps:
+      - name: deploy
+        run: echo "deploying"
